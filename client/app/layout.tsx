@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
+import UserProvider from "@/providers/UserProvider";
+import { Toaster } from "react-hot-toast";
+import { Poppins } from 'next/font/google';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./components/AppSidebar";
+import { Header } from "./components/Header";
+import MainContentLayout from "@/providers/MainContentLayout";
+import MainLayout from "@/providers/MainLayout";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '700'],
 });
 
 export const metadata: Metadata = {
@@ -25,11 +26,37 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+      </head>
+      <body className={poppins.className}>
+        <Toaster position="top-center" />
+        <UserProvider>
+          <div className="h-full flex overflow-hidden">
+            <SidebarProvider>
+              <AppSidebar />
+              <main>
+                <SidebarTrigger />
+                {children}
+              </main>
+            </SidebarProvider>
+            <div className="flex-1 flex flex-col">
+              <Header />
+              <MainContentLayout>
+                <MainLayout>{children}</MainLayout>
+                <SidebarProvider />
+              </MainContentLayout>
+            </div>
+          </div>
+          {children}
+        </UserProvider>
       </body>
-    </html>
+    </html >
   );
 }
